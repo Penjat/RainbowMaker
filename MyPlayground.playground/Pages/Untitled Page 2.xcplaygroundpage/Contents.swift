@@ -60,9 +60,9 @@ struct PolarView: View {
     var wav: (Double) -> Double = sin
     var body: some View {
         Path { path in
-            path.move(to: CGPoint(x: sin(Double(0))*100+200, y: cos(Double(0))*100+200))
+            path.move(to: CGPoint(x: cos(Double(0))*100+200, y: sin(Double(0))*100+200))
             for angle in 0..<360 {
-                path.addLine(to: CGPoint(x: sin(Double(angle))*100+200, y: cos(Double(angle))*100+200))
+                path.addLine(to: CGPoint(x: cos(Double(angle)/360*Double.pi*2)*100+200, y: sin(Double(angle)/360*Double.pi*2+Double.pi)*100+200))
             }
         }.stroke(Color.blue, lineWidth: 4.0)
     }
