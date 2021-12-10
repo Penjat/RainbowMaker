@@ -47,7 +47,7 @@ struct ContentView: View {
                 .border(Color.black, width: 4)
                 .padding()
             
-            WaveView(frequency: 1.0, wav: sin, colorWav: rainbowColor)
+            WaveView(frequency: 1.0, wav: sin)
                 .frame(width: 600, height: 200)
                 .border(Color.black, width: 4)
                 .padding()
@@ -77,7 +77,7 @@ struct ContentView: View {
 
 var rainbowColor: (Double) -> Color {
     return {(input: Double) -> Color in
-        let (_, _, _, color) = calcRGB(Int(input*40), total: 40)
+        let (_, _, _, color) = calcRGB(Int((input+1)*40), total: 20)
         return color
     }
 }
