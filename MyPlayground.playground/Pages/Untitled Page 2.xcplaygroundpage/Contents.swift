@@ -40,7 +40,7 @@ PlaygroundPage.current.setLiveView(ContentView())
 
 struct ContentView: View {
     var body: some View {
-        WaveView(frequency: 4)
+        WaveView(frequency: 2.0, wav: sin)
             .frame(width: 600, height: 400)
             .border(Color.black, width: 4)
             .padding()
@@ -49,11 +49,22 @@ struct ContentView: View {
 
 struct WaveView: View {
     let frequency: Double
+    var wav: (Double) -> Double = sin
     var body: some View {
         HStack(spacing: 4) {
             ForEach(0..<40){ index in
-                let height = abs(sin(Double(index)/40.0*Double.pi*frequency)*80)
-                Rectangle().fill(Color.blue).frame(width: 10, height: height)
+                let height = wav(Double(index)/40.0*Double.pi*frequency)*80
+                VStack(spacing: 0.0) {
+                    VStack {
+                        Spacer()
+                        Rectangle().fill(Color.blue).frame(width: 10, height: height)
+                    }
+                    VStack {
+                        Rectangle().fill(Color.orange).frame(width: 10, height: -height)
+                        Spacer()
+                    }
+                }
+                
             }
         }
     }
