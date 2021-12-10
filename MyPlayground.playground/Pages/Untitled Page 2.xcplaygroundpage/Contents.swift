@@ -6,12 +6,12 @@ import Foundation
 
 
 func triangleWave(_ input: Double) -> Double {
-    return 1-abs((input+Double.pi/4 ).remainder(dividingBy:Double.pi)/Double.pi)*4
+    return ((input+Double.pi/2 ).remainder(dividingBy:Double.pi)/Double.pi)*2
     
 }
 
 func squareWave(_ input: Double) -> Double  {
-    return (input.remainder(dividingBy: Double.pi) >= 0) ? 1 : -1
+    return (input.remainder(dividingBy: Double.pi*2) >= 0) ? 1 : -1
 }
 
 func sawWave(_ input: Double) -> Double {
@@ -40,7 +40,7 @@ PlaygroundPage.current.setLiveView(ContentView())
 
 struct ContentView: View {
     var body: some View {
-        WaveView(frequency: 2.0, wav: sin)
+        WaveView(frequency: 1.0, wav: squareWave)
             .frame(width: 600, height: 400)
             .border(Color.black, width: 4)
             .padding()
@@ -53,7 +53,7 @@ struct WaveView: View {
     var body: some View {
         HStack(spacing: 4) {
             ForEach(0..<40){ index in
-                let height = wav(Double(index)/40.0*Double.pi*frequency)*80
+                let height = wav(Double(index)/40.0*Double.pi*2*frequency)*80
                 VStack(spacing: 0.0) {
                     VStack {
                         Spacer()
