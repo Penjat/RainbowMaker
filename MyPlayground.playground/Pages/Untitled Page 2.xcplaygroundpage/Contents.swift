@@ -15,8 +15,12 @@ func sawWave(_ input: Double) -> Double {
     return input.remainder(dividingBy: Double.pi*2)/(Double.pi)
 }
 
+func noise(_ input: Double) -> Double {
+    return Double.random(in: -1...1)
+}
+
 func combo(_ input: Double) -> Double {
-    return (triangleWave(input*10)/10 + sin(input))/2.0
+    return (triangleWave(input*10)/10 + sin(input))/2.0 + noise(input)/10
 }
 
 func calcRGB(_ index: Int, total: Double, wav: (Double)->Double = sin) -> (Double, Double, Double, Color) {
@@ -50,7 +54,15 @@ struct ContentView: View {
                 .frame(width: 600, height: 200)
                 .border(Color.black, width: 4)
                 .padding()
-            WaveView(frequency: 1.0, wav: squareWave)
+            WaveView(frequency: 2.0, wav: squareWave)
+                .frame(width: 600, height: 200)
+                .border(Color.black, width: 4)
+                .padding()
+            WaveView(frequency: 2.0, wav: noise)
+                .frame(width: 600, height: 200)
+                .border(Color.black, width: 4)
+                .padding()
+            WaveView(frequency: 3.0, wav: combo)
                 .frame(width: 600, height: 200)
                 .border(Color.black, width: 4)
                 .padding()
@@ -109,6 +121,3 @@ struct TestView: View {
         }.frame(width: 600)
     }
 }
-
-
-
