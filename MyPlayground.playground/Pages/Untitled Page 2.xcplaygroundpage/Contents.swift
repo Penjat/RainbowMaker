@@ -12,7 +12,7 @@ func squareWave(_ input: Double) -> Double  {
 }
 
 func sawWave(_ input: Double) -> Double {
-    return input.remainder(dividingBy: Double.pi*2)/(Double.pi)
+    return input.remainder(dividingBy: Double.pi*2)/(Double.pi*2)
 }
 
 func noise(_ input: Double) -> Double {
@@ -42,43 +42,54 @@ PlaygroundPage.current.setLiveView(ContentView())
 struct ContentView: View {
     var body: some View {
         VStack {
-            PolarView()
-                .frame(width: 500, height: 500)
-                .border(Color.black, width: 4)
-//            WaveBowView()
+            WaveBowView()
+            WaveBowView(wav: {sin($0) + sin($0*7)/10 + sawWave($0*20)/20 + noise($0)/40})
+            WaveBowView(wav: {squareWave($0)/2+squareWave($0*3.7)/4+squareWave($0*19)/20 + sin($0*9.3)/3})
+            WaveBowView(wav: {sawWave($0*2.6)})
 //            WaveBowView(wav: {(sin($0) + triangleWave($0*8) )/2})
 //            WaveBowView(wav: {(sin($0) + sin($0*3)/3)/2})
 //            WaveBowView(wav: {(triangleWave($0) + sin($0)/3)})
-//            WaveBowView(wav: {abs(sin($0) + noise($0)/4 + sawWave($0*4)/4)})
+//            WaveBowView(wav: {abs(sin($0) + noise($0)/4 + sawWave($0*4)/4) + sin($0)/2})
 //            WaveBowView(wav: {sin($0)/2 + sawWave($0*2)/2 + noise($0)/8})
 //            WaveBowView(wav: {sin($0) + sin($0*4)/4 + sin($0*8)/8})
+//            WaveBowView(wav: {sin($0) + triangleWave($0*3)/6 + noise($0)/20})
+//            WaveBowView(wav: {noise($0)})
         }
     }
 }
 
 struct PolarView: View {
     var wav: (Double) -> Double = sin
+    let radius = 120.0
+    let drawPoints = 360.0
     var body: some View {
-        Path { path in
-            path.move(to: CGPoint(x: cos(Double(0))*100+200, y: sin(Double(0))*100+200))
-            for angle in 0..<361 {
-                path.addLine(to: CGPoint(x: wav(Double(angle)/360*Double.pi*2+Double.pi/2)*100+200, y: wav(Double(angle)/360*Double.pi*2+Double.pi)*100+200))
+        ZStack {
+            ForEach(0..<Int(drawPoints+1)) { angle in
+                let (_, _, _, color) = calcRGB(angle, total: drawPoints, wav: wav)
+                
+                Path { path in
+                    path.move(to: CGPoint(x: 200, y: 200))
+                    path.addLine(to: CGPoint(x: wav(Double(angle)/drawPoints*Double.pi*2+Double.pi/2)*radius+200, y: wav(Double(angle)/drawPoints*Double.pi*2)*radius+200))
+                }.stroke(color, lineWidth: 2.0)
             }
-        }.stroke(Color.blue, lineWidth: 4.0)
+        }.frame(width: 500, height: 500)
     }
 }
+
 
 struct WaveBowView: View {
     var wav: (Double) -> Double = sin
     var body: some View {
         VStack {
-        ColorBandView(wav: wav)
-            .padding()
-        
-        
-        WaveView(frequency: 1.0, wav: wav)
-            .frame(width: 600, height: 300)
-            .padding()
+            ColorBandView(wav: wav)
+                .padding()
+            
+            
+            WaveView(frequency: 1.0, wav: wav)
+                .frame(width: 600, height: 300)
+                .padding()
+            
+            PolarView(wav: wav)
         }.border(Color.black, width: 4)
     }
 }
