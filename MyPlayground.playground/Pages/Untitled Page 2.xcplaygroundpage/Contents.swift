@@ -4,8 +4,7 @@ import PlaygroundSupport
 import Foundation
 
 func triangleWave(_ input: Double) -> Double {
-    return ((input+Double.pi/2 ).remainder(dividingBy:Double.pi)/Double.pi)*2
-    
+    return abs((input + Double.pi/2).remainder(dividingBy:Double.pi*2)/Double.pi)-0.5
 }
 
 func squareWave(_ input: Double) -> Double  {
@@ -38,7 +37,7 @@ PlaygroundPage.current.setLiveView(ContentView())
 
 struct ContentView: View {
     var body: some View {
-        WaveView(frequency: 1.0, wav: sawWave)
+        WaveView(frequency: 1.0, wav: triangleWave)
             .frame(width: 600, height: 400)
             .border(Color.black, width: 4)
             .padding()
