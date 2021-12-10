@@ -3,8 +3,6 @@ import Combine
 import PlaygroundSupport
 import Foundation
 
-
-
 func triangleWave(_ input: Double) -> Double {
     return ((input+Double.pi/2 ).remainder(dividingBy:Double.pi)/Double.pi)*2
     
@@ -15,7 +13,7 @@ func squareWave(_ input: Double) -> Double  {
 }
 
 func sawWave(_ input: Double) -> Double {
-    return input.remainder(dividingBy: Double.pi)/(Double.pi/2)
+    return input.remainder(dividingBy: Double.pi*2)/(Double.pi/2)
 }
 
 func combo(_ input: Double) -> Double {
@@ -40,7 +38,7 @@ PlaygroundPage.current.setLiveView(ContentView())
 
 struct ContentView: View {
     var body: some View {
-        WaveView(frequency: 1.0, wav: squareWave)
+        WaveView(frequency: 1.0, wav: sawWave)
             .frame(width: 600, height: 400)
             .border(Color.black, width: 4)
             .padding()
@@ -64,7 +62,6 @@ struct WaveView: View {
                         Spacer()
                     }
                 }
-                
             }
         }
     }
