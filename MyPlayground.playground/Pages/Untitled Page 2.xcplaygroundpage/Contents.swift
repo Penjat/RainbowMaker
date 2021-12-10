@@ -42,6 +42,11 @@ PlaygroundPage.current.setLiveView(ContentView())
 struct ContentView: View {
     var body: some View {
         VStack {
+            ColorBandView()
+//                .frame(width: 600, height: 200)
+                .border(Color.black, width: 4)
+                .padding()
+            
             WaveView(frequency: 1.0, wav: sin)
                 .frame(width: 600, height: 200)
                 .border(Color.black, width: 4)
@@ -70,20 +75,40 @@ struct ContentView: View {
     }
 }
 
+struct ColorBandView: View  {
+    var body: some View {
+        ScrollView(.horizontal) {
+            HStack {
+                ForEach(0..<200) { index in
+                    let (red, blue, green, color) = calcRGB(index, total: 100)
+                    Rectangle()
+                        .fill(color)
+                        .frame(width: 20, height: 60)
+                }
+            }
+        }.frame(width: 600, height: 400)
+    }
+}
+
 struct WaveView: View {
     let frequency: Double
     var wav: (Double) -> Double = sin
+    var colorWav: (Double) -> Color = {(input: Double) -> Color in
+        return input >= 0 ? Color.blue : Color.green
+    }
     var body: some View {
         HStack(spacing: 4) {
             ForEach(0..<40){ index in
-                let height = wav(Double(index)/40.0*Double.pi*2*frequency)*80
+                let wavOutput = wav(Double(index)/40.0*Double.pi*2*frequency)
+                let height = wavOutput*80
+                
                 VStack(spacing: 0.0) {
                     VStack {
                         Spacer()
-                        Rectangle().fill(Color.blue).frame(width: 10, height: height)
+                        Rectangle().fill(colorWav(wavOutput)).frame(width: 10, height: height)
                     }
                     VStack {
-                        Rectangle().fill(Color.orange).frame(width: 10, height: -height)
+                        Rectangle().fill(colorWav(wavOutput)).frame(width: 10, height: -height)
                         Spacer()
                     }
                 }
