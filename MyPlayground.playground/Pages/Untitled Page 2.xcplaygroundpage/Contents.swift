@@ -3,6 +3,29 @@ import Combine
 import PlaygroundSupport
 import Foundation
 
+enum WaveType: String, CaseIterable {
+    case SIN
+    case TRI
+    case SQUARE
+    case SAW
+    case NOISE
+    
+    var waveForm: (Double) -> Double {
+        switch self {
+        case .SIN:
+            return sin
+        case .TRI:
+            return triangleWave
+        case .NOISE:
+            return noise
+        case .SQUARE:
+            return squareWave
+        case .SAW:
+            return sawWave
+        }
+    }
+}
+
 func triangleWave(_ input: Double) -> Double {
     return abs((input + Double.pi/2).remainder(dividingBy:Double.pi*2)/Double.pi)-0.5
 }
@@ -44,8 +67,14 @@ struct WaveController: View {
     @State var frequency = 1.0
     @State var magnitude = 1.0
     @State var phase = 0.0
+    @State var waveType = WaveType.SIN
     var body: some View {
         VStack {
+            Picker(selection: $waveType, label: Text(waveType.rawValue)) {
+                ForEach(WaveType.allCases, id: \.rawValue){ waveType in
+                    Text("\(waveType.rawValue)").tag(waveType)
+                }
+            }.pickerStyle(SegmentedPickerStyle()).frame(height: 100).padding()
             Text("\(frequency)")
             Slider(value: $frequency, in: 0.0...5.0).onChange(of: frequency) { _ in
                 setWave()
@@ -60,11 +89,13 @@ struct WaveController: View {
             Slider(value: $phase, in: (Double.pi*(-2))...Double.pi*(2)).onChange(of: phase) { _ in
                 setWave()
             }
+        }.onChange(of: waveType) { _ in
+            setWave()
         }
     }
     
     func setWave() {
-        wav = { sin($0*frequency + phase)*magnitude}
+        wav = { waveType.waveForm($0*frequency + phase)*magnitude}
     }
 }
 
