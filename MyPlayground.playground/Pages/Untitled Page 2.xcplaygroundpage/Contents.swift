@@ -39,13 +39,44 @@ func calcRGB(_ index: Int, total: Double, wav: (Double)->Double = sin) -> (Doubl
 
 PlaygroundPage.current.setLiveView(ContentView())
 
-struct ContentView: View {
+struct WaveController: View {
+    @Binding var wav: (Double) -> Double
+    @State var frequency = 1.0
+    @State var magnitude = 1.0
+    @State var phase = 0.0
     var body: some View {
         VStack {
-            WaveBowView()
-            WaveBowView(wav: {sin($0) + sin($0*7)/10 + sawWave($0*20)/20 + noise($0)/40})
-            WaveBowView(wav: {squareWave($0)/2+squareWave($0*3.7)/4+squareWave($0*19)/20 + sin($0*9.3)/3})
-            WaveBowView(wav: {sawWave($0*2.6)})
+            Text("\(frequency)")
+            Slider(value: $frequency, in: 0.0...5.0).onChange(of: frequency) { _ in
+                setWave()
+            }
+            
+            Text("\(magnitude)")
+            Slider(value: $magnitude, in: 0.0...2.0).onChange(of: magnitude) { _ in
+                setWave()
+            }
+            
+            Text("\(phase)")
+            Slider(value: $phase, in: (Double.pi*(-2))...Double.pi*(2)).onChange(of: phase) { _ in
+                setWave()
+            }
+        }
+    }
+    
+    func setWave() {
+        wav = { sin($0*frequency + phase)*magnitude}
+    }
+}
+
+struct ContentView: View {
+    @State var wav: (Double) -> Double = sin
+    var body: some View {
+        VStack {
+            WaveController(wav: $wav)
+//            WaveBowView()
+            WaveBowView(wav: wav)
+//            WaveBowView(wav: {squareWave($0)/2+squareWave($0*3.7)/4+squareWave($0*19)/20 + sin($0*9.3)/3})
+//            WaveBowView(wav: {sawWave($0*2.6)})
 //            WaveBowView(wav: {(sin($0) + triangleWave($0*8) )/2})
 //            WaveBowView(wav: {(sin($0) + sin($0*3)/3)/2})
 //            WaveBowView(wav: {(triangleWave($0) + sin($0)/3)})
