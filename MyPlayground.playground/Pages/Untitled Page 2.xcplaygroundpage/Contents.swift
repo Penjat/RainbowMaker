@@ -3,6 +3,29 @@ import Combine
 import PlaygroundSupport
 import Foundation
 
+enum WaveType: String, CaseIterable {
+    case SIN
+    case TRI
+    case SQUARE
+    case SAW
+    case NOISE
+    
+    var waveForm: (Double) -> Double {
+        switch self {
+        case .SIN:
+            return sin
+        case .TRI:
+            return triangleWave
+        case .NOISE:
+            return noise
+        case .SQUARE:
+            return squareWave
+        case .SAW:
+            return sawWave
+        }
+    }
+}
+
 func triangleWave(_ input: Double) -> Double {
     return abs((input + Double.pi/2).remainder(dividingBy:Double.pi*2)/Double.pi)-0.5
 }
@@ -39,13 +62,63 @@ func calcRGB(_ index: Int, total: Double, wav: (Double)->Double = sin) -> (Doubl
 
 PlaygroundPage.current.setLiveView(ContentView())
 
-struct ContentView: View {
+struct WaveController: View {
+    @Binding var wav: (Double) -> Double
+    @State var frequency = 1.0
+    @State var magnitude = 0.25
+    @State var phase = 0.0
+    @State var waveType = WaveType.SIN
     var body: some View {
         VStack {
-            WaveBowView()
-            WaveBowView(wav: {sin($0) + sin($0*7)/10 + sawWave($0*20)/20 + noise($0)/40})
-            WaveBowView(wav: {squareWave($0)/2+squareWave($0*3.7)/4+squareWave($0*19)/20 + sin($0*9.3)/3})
-            WaveBowView(wav: {sawWave($0*2.6)})
+            Picker(selection: $waveType, label: Text("")) {
+                ForEach(WaveType.allCases, id: \.rawValue){ waveType in
+                    Text("\(waveType.rawValue)").tag(waveType)
+                }
+            }.pickerStyle(SegmentedPickerStyle()).frame(height: 100).padding()
+            Text("\(frequency)")
+            Slider(value: $frequency, in: 0.0...5.0).onChange(of: frequency) { _ in
+                setWave()
+            }
+            
+            Text("\(magnitude)")
+            Slider(value: $magnitude, in: 0.0...2.0).onChange(of: magnitude) { _ in
+                setWave()
+            }
+            
+            Text("\(phase)")
+            Slider(value: $phase, in: (Double.pi*(-2))...Double.pi*(2)).onChange(of: phase) { _ in
+                setWave()
+            }
+        }.onChange(of: waveType) { _ in
+            setWave()
+        }
+    }
+    
+    func setWave() {
+        wav = { waveType.waveForm($0*frequency + phase)*magnitude}
+    }
+}
+
+struct ContentView: View {
+    @State var wav1: (Double) -> Double = sin
+    @State var wav2: (Double) -> Double = sin
+    @State var wav3: (Double) -> Double = sin
+    @State var wav4: (Double) -> Double = sin
+    var body: some View {
+        VStack {
+            HStack {
+                WaveController(wav: $wav1)
+                WaveController(wav: $wav2)
+            }
+            HStack {
+                WaveController(wav: $wav3)
+                WaveController(wav: $wav4)
+            }
+            
+//            WaveBowView()
+            WaveBowView(wav: { wav1($0) + wav2($0) + wav3($0) + wav4($0)})
+//            WaveBowView(wav: {squareWave($0)/2+squareWave($0*3.7)/4+squareWave($0*19)/20 + sin($0*9.3)/3})
+//            WaveBowView(wav: {sawWave($0*2.6)})
 //            WaveBowView(wav: {(sin($0) + triangleWave($0*8) )/2})
 //            WaveBowView(wav: {(sin($0) + sin($0*3)/3)/2})
 //            WaveBowView(wav: {(triangleWave($0) + sin($0)/3)})
@@ -89,7 +162,7 @@ struct WaveBowView: View {
                 .frame(width: 600, height: 300)
                 .padding()
             
-            PolarView(wav: wav)
+//            PolarView(wav: wav)
         }.border(Color.black, width: 4)
     }
 }
